@@ -10,3 +10,12 @@
   kubectl get secret super-user -o jsonpath='{.data.user\.p12}' | base64 -d > user.p12
   kubectl get secret super-user -o jsonpath='{.data.user\.password}' | base64 -d > user.password
   ```
+
+### general commands
+  ```
+  oc get kafka
+  oc get kafkatopic
+  oc get kafkauser
+  oc get kafka kafka-cluster -o yaml
+  oc delete kafka kafka-cluster
+  ```
