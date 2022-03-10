@@ -1,0 +1,99 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: kafka-cluster
+  namespace: kafka
+spec:
+  entityOperator:
+    topicOperator: { }
+    userOperator: { }
+  kafka:
+    config:
+      compression.type: producer
+      inter.broker.protocol.version: '2.8'
+      transaction.state.log.replication.factor: 3
+      ssl.enabled.protocols: TLSv1.2
+      num.partitions: 10
+      log.message.format.version: '2.8'
+      transaction.state.log.min.isr: 2
+      ssl.protocol: TLSv1.2
+      auto.create.topics.enable: 'false'
+      offsets.topic.replication.factor: 3
+      default.replication.factor: 3
+    resources:
+      limits:
+        cpu: '8'
+        memory: 16Gi
+      requests:
+        cpu: '4'
+        memory: 12Gi
+    readinessProbe:
+      initialDelaySeconds: 180
+      timeoutSeconds: 5
+    livenessProbe:
+      initialDelaySeconds: 15
+      timeoutSeconds: 5
+    version: 2.8.0
+    template:
+      pod:
+        terminationGracePeriodSeconds: 300
+    storage:
+      type: ephemeral
+    replicas: 3
+    jvmOptions:
+      '-Xms': 8192m
+      '-Xmx': 8192m
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      - name: tls
+        port: 9093
+        tls: true
+        type: internal
+        authentication:
+          type: tls
+      - name: external
+        port: 9094
+        tls: true
+        type: route
+        authentication:
+          type: tls
+  kafkaExporter:
+    enableSaramaLogging: true
+    groupRegex: .*
+    logging: debug
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 2048Mi
+      requests:
+        cpu: 400m
+        memory: 512Mi
+    template:
+      pod:
+        terminationGracePeriodSeconds: 120
+    topicRegex: .*
+  zookeeper:
+    config:
+      sslQuorum: true
+    jvmOptions:
+      '-Xms': 2048m
+      '-Xmx': 2048m
+    livenessProbe:
+      initialDelaySeconds: 15
+      timeoutSeconds: 5
+    readinessProbe:
+      initialDelaySeconds: 15
+      timeoutSeconds: 5
+    replicas: 3
+    resources:
+      limits:
+        cpu: '2'
+        memory: 8Gi
+      requests:
+        cpu: '1'
+        memory: 4Gi
+    storage:
+      type: ephemeral
