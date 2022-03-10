@@ -1,6 +1,6 @@
 ### bootstrap.server 
   ```
-  kubectl get kafka kafka-cluster-test -o=jsonpath='{.status.listeners[?(@.type=="external")].bootstrapServers}{"\n"}
+  kubectl get kafka kafka-cluster -o=jsonpath='{.status.listeners[?(@.type=="external")].bootstrapServers}{"\n"}
   ```
 
 ### commands to create truststore and keystore cert and passwords for SSL cluster
