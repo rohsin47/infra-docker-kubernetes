@@ -1,8 +1,12 @@
 ### bootstrap.server
 1. connecting from remote client machine different from docker running kafka
-localhost:29094
+  ```
+  localhost:29094
+  ```
 2. connecting from docker machine running kafka
-localhost:29092
+  ```
+  localhost:29092
+  ```
 
 ### jmx.metrics
   1. localhost:29103
