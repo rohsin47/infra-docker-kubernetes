@@ -1,4 +1,4 @@
-version: 3
+version: '3'
 services:
   kafka:
     logging:
@@ -22,7 +22,7 @@ services:
       - ./jmx-exporter:/usr/share/jmx_exporter/
       - kafka-jmx-volume:/jmx-exporter
     depends_on:
-      zookeeper
+      - zookeeper
   zookeeper:
     logging:
       driver: local
