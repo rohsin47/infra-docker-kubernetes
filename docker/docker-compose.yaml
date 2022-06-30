@@ -34,8 +34,44 @@ services:
     image: confluentinc/cp-zookeeper:latest
     networks:
       - kafka
+  prometheus:
+    image: prom/prometheus:v2.1.0
+    logging:
+      driver: local
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus-volume:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - 9090:9090
+    networks:
+      - kafka
+    restart: always
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    logging:
+      driver: local
+    volumes:
+      - grafana-volume:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    networks:
+      - kafka
+    environment:
+      - "GF_SECURITY_ADMIN_USER=kafka"
+      - "GF_SECURITY_ADMIN_PASSWORD=kafka"
+      - "GF_USERS_ALLOW_SIGN_UP=false"
+    ports:
+      - 3000:3000
 volumes:
   kafka-jmx-volume:
+  grafana-volume:
+  prometheus-volume:
 networks:
   kafka:
     external: false
