@@ -11,4 +11,4 @@
 ### jmx.metrics
   1. localhost:29103
   2. download and add jmx exporter jar if you need metrics and can comment line "EXTRA_ARGS"
-
+  3. download location : https://github.com/prometheus/jmx_exporter
