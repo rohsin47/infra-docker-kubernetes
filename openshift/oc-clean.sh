@@ -17,8 +17,8 @@ Delete resource in a Kubernetes cluster for a given namespace. Ensure you are lo
 Usage: ${SCRIPT_NAME} <options>
 -n | --namespace <name>					: Namespace
 -r | --resource <name>					: Resource to delete
--o | --object <name>					  : Objects to delete (comma separated list with valid values: statefulset,pvc,service,deployment,secret,configmap)
--h | --help								      : Show this usage
+-o | --object <name>					: Objects to delete (comma separated list with valid values: statefulset,pvc,service,deployment,secret,configmap)
+-h | --help						: Show this usage
 Examples:
 ========
 Delete postgres:					oc-clean.sh -n watergate-dit-infra -r postgres -o statefulset,pvc,service
