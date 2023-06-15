@@ -1,0 +1,79 @@
+version: "3.3"
+
+services:
+  
+  cassandra:
+    container_name: cassandra
+    image: cassandra:4.0.6
+    ports:
+      - "9042:9042"
+    volumes:
+      - ./tmp/cassandra:/var/lib/cassandra
+
+  zookeeper:
+    container_name: zookeeper
+    image: confluentinc/cp-zookeeper:7.2.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    container_name: kafka
+    image: confluentinc/cp-kafka:7.2.1
+    ports:
+      - "9093:9093"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: BROKER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9094,BROKER://kafka:9092,EXTERNAL://localhost:9093
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9094,BROKER://0.0.0.0:9092,EXTERNAL://0.0.0.0:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: 1
+      KAFKA_NUM_PARTITIONS: 2
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_DELETE_TOPIC_ENABLE: 'true'
+    depends_on:
+      - zookeeper
+
+  schema-registry:
+    container_name: schema-registry
+    image: confluentinc/cp-schema-registry:7.2.1
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: localhost
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:9094
+    depends_on:
+      - kafka
+
+  akhq:
+    image: tchiotludo/akhq
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            docker-kafka-server:
+              properties:
+                bootstrap.servers: "kafka-local:9094"
+              schema-registry:
+                url: "http://schema-registry-local:8081"
+              connect:
+                - name: "connect"
+                  url: "http://connect:8083"
+    ports:
+      - "18080:8080"
+    links:
+      - kafka
+      - schema-registry
+
+  minio:
+    container_name: minio
+    image: quay.io/minio/minio:RELEASE.2022-07-24T17-09-31Z
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: "admin123"
+      MINIO_ROOT_PASSWORD: "admin123"
